@@ -1,7 +1,5 @@
 class Visit < ApplicationRecord
-
-  validates
-
+  
   def self.record_visits!(user, shortened_url)
     Visit.create!(user_id: user.id, shortened_url_id: shortened_url.id)
   end
