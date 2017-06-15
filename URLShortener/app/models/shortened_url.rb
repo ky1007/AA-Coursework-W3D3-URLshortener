@@ -17,6 +17,12 @@ class ShortenedUrl < ApplicationRecord
       through: :visits,
       source: :user
 
+    has_many :unique_visitors,
+      # Proc.new { distinct }  IS THE SAME AS:
+      -> { distinct },
+      through: :visits,
+      source: :user
+
     def self.random_code
       code = SecureRandom.urlsafe_base64(4)
       while ShortenedUrl.exists?(short_url: code)
@@ -30,4 +36,23 @@ class ShortenedUrl < ApplicationRecord
       self.create!(long_url: long_url, short_url: code, user_id: user.id)
     end
 
+    def num_clicks
+      self.visits.count
+    end
+
+    def num_unique_clicks
+       self.visitors.select(:user_id).distinct.count
+    end
+
+    # select a period of time that we define is recent
+    # give the number of clicks within that time period
+    def num_recent_uniques
+      recent_clicks = self.visits.where("created_at: > ?", 10.minutes.ago)
+      recent_clicks.select(:user_id).distinct.count
+    end
+
+
 end
+
+# digg = ShortenedUrl.find(3)
+# digg.num_recent_uniqs
