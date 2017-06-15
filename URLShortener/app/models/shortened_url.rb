@@ -8,7 +8,14 @@ class ShortenedUrl < ApplicationRecord
       foreign_key: :user_id,
       class_name: :User
 
-    
+    has_many :visits,
+      primary_key: :id,
+      foreign_key: :shortened_url_id,
+      class_name: :Visit
+
+    has_many :visitors,
+      through: :visits,
+      source: :user
 
     def self.random_code
       code = SecureRandom.urlsafe_base64(4)
